@@ -1,0 +1,17 @@
+{
+  "name": "observability-elastic-stack",
+  "version": "1.0.0",
+  "description": "Studying elastic stack",
+  "main": "main.js",
+  "repository": "https://github.com/GiovannyLucas/observability-elastic-stack",
+  "author": "Giovanny Lucas <giovannylucax@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "node main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "cron": "^2.1.0"
+  }
+}
