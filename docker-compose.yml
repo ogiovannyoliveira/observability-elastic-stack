@@ -1,0 +1,14 @@
+version: '3.8'
+
+networks:
+  elastic-stack:
+    name: elastic-stack-network
+    driver: bridge
+
+services:
+  nodejs-server:
+    build: ./nodejs-server
+    ports:
+      - "3333:3333"
+    networks:
+      - elastic-stack
