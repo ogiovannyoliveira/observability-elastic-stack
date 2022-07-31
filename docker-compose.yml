@@ -12,3 +12,10 @@ services:
       - "3333:3333"
     networks:
       - elastic-stack
+  
+  golang-server:
+    build: ./golang-server
+    ports:
+      - "3334:3334"
+    networks:
+      - elastic-stack
