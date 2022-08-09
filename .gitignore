@@ -1,3 +1,7 @@
+# rabbitmq volume
+data
+log
+
 # Logs
 logs
 *.log

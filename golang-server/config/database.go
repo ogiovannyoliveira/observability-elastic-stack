@@ -20,6 +20,7 @@ func init() {
 }
 
 func GetDSN() string {
+	return "host=127.0.0.1 user=developer password=dv1010aa dbname=classes_scheduler port=5432 sslmode=disable"
 	return fmt.Sprintf(
 		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable", 
 		DB_HOST,
