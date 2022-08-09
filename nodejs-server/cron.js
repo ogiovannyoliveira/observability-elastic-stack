@@ -7,7 +7,7 @@ export function initializeCron() {
     console.log('You will see this message every minute');
     console.log('Running at:', new Date());
     
-    const channel = (await getQueueConnection()).createChannel();
+    const channel = await (await getQueueConnection()).createChannel();
     const queue = 'command';
     const msg = `Hello World! ${Date.now()}`;
     await channel.assertQueue(queue);

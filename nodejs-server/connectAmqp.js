@@ -7,8 +7,8 @@ export default async function getQueueConnection() {
     return connection.createChannel();
   }
 
-  this.connection = connection;
-  this.createChannel = createChannel;
-
-  return this;
+  return {
+    connection,
+    createChannel
+  }
 }
