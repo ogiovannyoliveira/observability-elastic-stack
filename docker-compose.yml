@@ -10,28 +10,28 @@ volumes:
     driver: local
 
 services:
-  # nodejs-server:
-  #   build: ./nodejs-server
-  #   container_name: nodejs-server
-  #   ports:
-  #     - 3333:3333
-  #   networks:
-  #     - elastic-stack
+  nodejs-server:
+    build: ./nodejs-server
+    container_name: nodejs-server
+    ports:
+      - 3333:3333
+    networks:
+      - elastic-stack
   
-  # golang-server:
-  #   build: ./golang-server
-  #   container_name: golang-server
-  #   ports:
-  #     - 3334:3334
-  #   environment:
-  #     - DB_USER=developer
-  #     - DB_PASSWORD=dv1010aa
-  #     - DB_NAME=developer
-  #     - DB_HOST=database
-  #     - DB_PORT=3306 
-  #     - RABBITMQ_URL=amqp://guest:guest@localhost:5672/
-  #   networks:
-  #     - elastic-stack
+  golang-server:
+    build: ./golang-server
+    container_name: golang-server
+    ports:
+      - 3334:3334
+    environment:
+      - DB_USER=developer
+      - DB_PASSWORD=dv1010aa
+      - DB_NAME=developer
+      - DB_HOST=database
+      - DB_PORT=3306 
+      - RABBITMQ_URL=amqp://guest:guest@localhost:5672/
+    networks:
+      - elastic-stack
   
   rabbitmq:
     image: rabbitmq:3-management
@@ -58,5 +58,51 @@ services:
       - POSTGRES_DB=developer
     volumes:
       - postgres-database:/data/postgres
+    networks:
+      - elastic-stack
+
+  # observability
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.13.0
+    container_name: elasticsearch
+    environment:
+      - node.name=elasticsearch
+      - cluster.name=es-docker-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - http.cors.enabled=true
+      - http.cors.allow-origin="*"
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - ./elastic-search/data:/usr/share/elasticsearch/data
+    ports:
+      - 9200:9200
+    networks: 
+      - elastic-stack
+   
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.13.0
+    container_name: kibana
+    ports:
+      - 5601:5601
+    environment:
+      ELASTICSEARCH_URL: http://elasticsearch:9200
+      ELASTICSEARCH_HOSTS: '["http://elasticsearch:9200"]'
+    networks: 
+      - elastic-stack
+    
+  metricbeat:
+    image: docker.elastic.co/beats/metricbeat:7.13.0
+    container_name: metricbeat
+    user: root
+    command: -strict.perms=false
+    volumes:      
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./elastic-search/beats/metric/metricbeat.yml:/usr/share/metricbeat/metricbeat.yml
+    restart: on-failure
     networks:
       - elastic-stack
