@@ -13,7 +13,7 @@ var (
 	err error
 )
 
-func ConnectOnDatabase() {
+func Connect() {
 	dsn := config.GetDSN()
 
 	DB, err = gorm.Open(postgres.Open(dsn))

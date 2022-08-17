@@ -6,5 +6,9 @@ import (
 )
 
 func Create(event *models.Event) {
-	database.DB.Create(&event)
+	database.DB.Raw(
+		"INSERT INTO events (name, date) VALUES (?, ?) RETURNING *",
+		event.Name,
+		event.Date,
+	).Scan(&event)
 }

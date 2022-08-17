@@ -5,22 +5,33 @@ networks:
     name: elastic-stack-network
     driver: bridge
 
+volumes:
+  postgres-database:
+    driver: local
+
 services:
-  nodejs-server:
-    build: ./nodejs-server
-    container_name: nodejs-server
-    ports:
-      - "3333:3333"
-    networks:
-      - elastic-stack
+  # nodejs-server:
+  #   build: ./nodejs-server
+  #   container_name: nodejs-server
+  #   ports:
+  #     - 3333:3333
+  #   networks:
+  #     - elastic-stack
   
-  golang-server:
-    build: ./golang-server
-    container_name: golang-server
-    ports:
-      - "3334:3334"
-    networks:
-      - elastic-stack
+  # golang-server:
+  #   build: ./golang-server
+  #   container_name: golang-server
+  #   ports:
+  #     - 3334:3334
+  #   environment:
+  #     - DB_USER=developer
+  #     - DB_PASSWORD=dv1010aa
+  #     - DB_NAME=developer
+  #     - DB_HOST=database
+  #     - DB_PORT=3306 
+  #     - RABBITMQ_URL=amqp://guest:guest@localhost:5672/
+  #   networks:
+  #     - elastic-stack
   
   rabbitmq:
     image: rabbitmq:3-management
@@ -31,5 +42,21 @@ services:
     volumes:
       - ./rabbitmq/data/:/var/lib/rabbitmq
       - ./rabbitmq/log/:/var/log/rabbitmq
+    networks:
+      - elastic-stack
+
+  database:
+    build: ./database
+    image: database
+    container_name: database
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=developer
+      - POSTGRES_PASSWORD=dv1010aa
+      - POSTGRES_DB=developer
+    volumes:
+      - postgres-database:/data/postgres
     networks:
       - elastic-stack

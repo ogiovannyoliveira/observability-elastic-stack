@@ -9,9 +9,12 @@ export function initializeCron() {
     
     const channel = await (await getQueueConnection()).createChannel();
     const queue = 'command';
-    const msg = `Hello World! ${Date.now()}`;
+    const msg = {
+      name: `test-${Date.now()}`,
+      date: new Date(),
+    };
     await channel.assertQueue(queue);
-    channel.sendToQueue(queue, Buffer.from(msg));
+    channel.sendToQueue(queue, Buffer.from(JSON.stringify(msg)));
     
     console.log('Message', msg, 'sent to', queue);
     console.log('\n');
