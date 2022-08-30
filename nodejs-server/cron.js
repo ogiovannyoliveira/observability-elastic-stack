@@ -3,20 +3,29 @@ import getQueueConnection from './connectAmqp.js';
 
 export function initializeCron() {
   // cron job to run every second
-  new CronJob('* * * * * *', async function() {
-    console.log('You will see this message every minute');
+  new CronJob('* * * * *', async function() {
     console.log('Running at:', new Date());
     
-    const channel = await (await getQueueConnection()).createChannel();
     const queue = 'command';
     const msg = {
       name: `test-${Date.now()}`,
       date: new Date(),
     };
-    await channel.assertQueue(queue);
-    channel.sendToQueue(queue, Buffer.from(JSON.stringify(msg)));
+
+    await sendToQueue(queue, msg);
     
-    console.log('Message', msg, 'sent to', queue);
     console.log('\n');
   }).start();
+}
+
+export async function sendToQueue(queue, msg) {
+  return new Promise((resolve, reject) => {
+    const channel = getQueueConnection().then(conn => conn.createChannel());
+    channel.then(ch => {
+      ch.assertQueue(queue);
+      ch.sendToQueue(queue, Buffer.from(JSON.stringify(msg)));
+      console.log('Message', msg, 'sent to', queue);
+      resolve();
+    }).catch(err => reject(err));
+  }).catch(err => console.log(err));
 }

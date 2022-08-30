@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/giovannylucas/observability-elastic-stack/golang-server/database"
 	"github.com/giovannylucas/observability-elastic-stack/golang-server/models"
@@ -20,7 +21,8 @@ func main() {
 	// create a new router
 	r := routes.HandleRequests()
 
-	connection, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
+	// amqp://guest:guest@localhost:5672/  os.Getenv("AMQP_URL")
+	connection, err := amqp.Dial(os.Getenv("AMQP_URL"))
 	
 	if err != nil {
 		log.Println(err)
@@ -39,6 +41,8 @@ func main() {
 		false, 		  // no-wait
 		nil, 			  // args
 	)
+	
+	defer connection.Close()
 
 	var forever chan struct{}
 
@@ -57,13 +61,11 @@ func main() {
 			
 			log.Printf("Event created: %s", event.Name)
 		}
-	}()
-	
-	<-forever
-	
-	defer connection.Close()
+		}()
 	
 	// start the server
-	log.Println("Server started at port 3334!")
-	http.ListenAndServe(":3334", handlers.CORS(handlers.AllowedOrigins([]string{"*"}))(r))
+	log.Println("Server started at port 3335!")
+	http.ListenAndServe(":3335", handlers.CORS(handlers.AllowedOrigins([]string{"*"}))(r))
+	
+	<-forever
 }
